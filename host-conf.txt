@@ -27,9 +27,9 @@ pip install django gunicorn
 
 sudo ufw allow 8000
 
-python3 manage.py runserver  172.26.13.184:8000     
+python3 manage.py runserver  172.26.14.175:8000     
 
-gunicorn --bind 172.26.13.184:8000 mantrainout.wsgi   
+gunicorn --bind 172.26.14.175:8000 mantra_io.wsgi   
 
 deactivate
 
