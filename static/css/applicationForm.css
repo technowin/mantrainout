@@ -1,0 +1,243 @@
+* {
+	margin: 0;
+	padding: 0
+  }
+  
+  html {
+	height: 100%
+  }
+  
+  p {
+	color: grey
+  }
+  
+  #heading {
+	text-transform: uppercase;
+	color: #673AB7;
+	font-weight: normal;
+	letter-spacing: 0.1em;
+	text-align: center;
+  }
+  
+  .cardNew {
+	z-index: 0;
+	border: none;
+	position: relative;
+	box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+	width: 105%;
+	margin:2%;
+  }
+  
+  .fs-title {
+	font-size: 25px;
+	color: #2E3191;
+	margin-bottom: 15px;
+	font-weight: normal;
+	text-align: left
+  }
+  
+  .purple-text {
+	color: #2E3191;
+	font-weight: normal
+  }
+  
+  /* Buttons */
+  
+.upperButton{
+	margin: 2% 0%;
+}
+
+.LowerButton{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 2% 0%;
+}
+
+  .button {
+	height: 40px;
+	width: 200px;
+	position: relative;
+	background-color: transparent;
+	cursor: pointer;
+	border: 2px solid #673AB7;
+	overflow: hidden;
+	border-radius: 30px;
+	color: #673AB7;
+	transition: all 0.5s ease-in-out;
+	font-size: 14px;
+	margin-left: 2%;
+  }
+  
+  .btn-txt {
+	z-index: 1;
+	font-weight: 600;
+	letter-spacing: 4px;
+  }
+  
+  .type1::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0;
+	transition: all 0.5s ease-in-out;
+	background-color: #673AB7;
+	border-radius: 30px;
+	visibility: hidden;
+	height: 10px;
+	width: 10px;
+	z-index: -1;
+  }
+  
+  .button:hover {
+	color: #fff;
+	border: none;
+  }
+  
+  .type1:hover::after {
+	visibility: visible;
+	transform: scale(100) translateX(2px);
+  }
+  
+  .summernoteCss{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  }
+
+  .FormAndDocumentHere{
+	display: flex;
+	justify-content: center;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;	margin: 0% 5%;
+	border-radius: 18px;
+	height: 500px;
+	padding: 2% 0%;
+}
+
+.view-document {
+	color: black;
+	text-decoration: none;
+	padding: 18px 32px;
+	border: 2px solid #673AB7;
+	border-radius: 18px;
+}
+
+/* Upload Button In Modal */
+
+.container-btn-file {
+	display: flex;
+	position: relative;
+	justify-content: center;
+	align-items: center;
+	background-color: #307750;
+	color: #fff;
+	border-style: none;
+	padding: 1em 2em;
+	border-radius: 0.5em;
+	overflow: hidden;
+	z-index: 1;
+	box-shadow: 4px 8px 10px -3px rgba(0, 0, 0, 0.356);
+	transition: all 250ms;
+  }
+  .container-btn-file input[type="file"] {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	cursor: pointer;
+  }
+  .container-btn-file > svg {
+	margin-right: 1em;
+  }
+  .container-btn-file::before {
+	content: "";
+	position: absolute;
+	height: 100%;
+	width: 0;
+	border-radius: 0.5em;
+	background-color: #469b61;
+	z-index: -1;
+	transition: all 350ms;
+  }
+  .container-btn-file:hover::before {
+	width: 100%;
+}
+  
+.modal-content{
+	width: 130% !important;
+}
+
+
+table.dataTable.stripe tbody tr.odd,
+table.dataTable.display tbody tr.odd {
+  background: rgb(255, 255, 255);
+}
+
+th {
+  background-color: #a48dee;
+  color: white; /* Optional: change text color for better readability */
+  font-size: 18px;
+  border: 0.5px solid #a48dee;
+}
+
+td {
+  font-size: 17px; /* Adjust the size as needed */
+  border: 0.5px solid #a48dee !important;
+}
+
+table {
+  border-collapse: collapse !important;
+}
+
+.dataTables_wrapper .dataTables_filter {
+  float: right;
+  text-align: right;
+  margin-bottom: 1em;
+}
+.dataTables_wrapper .dataTables_length {
+  float: left;
+}
+.dataTables_wrapper .dataTables_paginate {
+  float: right;
+  margin-top: 10px;
+}
+.dataTables_wrapper .dataTables_info {
+  float: left;
+  margin-top: 10px;
+}
+.dataTables_wrapper .row {
+  display: flex;
+  align-items: center;
+}
+
+.dataTables_wrapper .dataTables_filter label {
+  display: flex;
+  align-items: center;
+}
+.dataTables_wrapper .dataTables_filter label input {
+  margin-left: 0.5em;
+  background-color: white;
+  border: 1px solid #ddd;
+  height: 35px; /* Adjust the height of the search box */
+  padding: 0.25em 0.5em; /* Adjust padding for the input */
+}
+
+/* Style the pagination buttons */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 0.3em 0.8em;
+  margin-left: 0.5em;
+  border: 1px solid #ddd;
+  border-radius: 0.25em;
+  background-color: #f8f9fa;
+  color: #333;
+  text-decoration: none;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background-color: #f6f5f5;
+  color: black;
+  border-color: black;
+}

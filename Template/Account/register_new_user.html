@@ -1,0 +1,157 @@
+{% comment %} {% extends "Shared/Layout.html" %} {% block username %}{{username}}{% endblock %} {% endcomment %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% csrf_token %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>{% block title %} mantra_io {% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/mantra_io.min.css' %}" rel="stylesheet">
+
+</head>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<body class="bg-gradient-primary">
+    <div class="container">
+        <div class="card o-hidden border-0 shadow-lg my-5" style="width: 70%; margin: 0 auto;">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                   {% comment %} <div class="col-lg-2">
+                   </div> {% endcomment %}
+                    <div class="col-lg-12">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">{% if id == '0' %}Create an Account!{% else%}Edit user Details{% endif %}</h1>
+                            </div>
+                            <form class="user" method="POST" action="{% url 'register_new_user' %}" onsubmit="return validatePassword()">
+                                {% csrf_token %}
+                                {% if id == '0' %}
+                                <input type="hidden" name="id" if  value="{{ id }}">
+                                {% else  %}
+                                <input type="hidden" name="id" if  value="{{ users.id }}">
+                                {% endif %} 
+
+
+
+                                <div class="form-group row">
+                                    
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label>First Name :-</label>
+                                        <input type="text" value="{{ first_name }}" class="form-control form-control-user" id="exampleFirstName" name="firstname" placeholder="First Name" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Last Name :-</label>
+                                        <input type="text" value="{{ last_name }}" class="form-control form-control-user" id="exampleLastName" name="lastname" placeholder="Last Name" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label>Mobile :-</label>
+                                        <input type="tel" value="{{ users.phone }}"  class="form-control form-control-user" id="exampleMobileNumber" name="mobileNumber" placeholder="Mobile Number" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Email :-</label>
+                                        <input type="email"  value="{{ users.email }}" class="form-control form-control-user" id="exampleInputEmail" name="email" placeholder="Email Address" required>
+                                    </div>
+                                </div>
+                              
+                              
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label>Role :-</label>
+                                        <select style="border-radius:10em;height: calc(2.5em + .75rem + 2px);font-size: .8rem;" name="role_id" id="role_id" class="form-control" required>
+                                            {% if not users.role_id %}
+                                                <option value="" Selected disabled>Select Role</option>
+                                            {% endif %}
+                                            {% for item in roles %}
+                                                <option value="{{ item.0 }}" {% if item.0 == users.role_id %}selected{% endif %}>{{ item.1 }}</option>
+                                            {% endfor %}
+                                        </select>                                    
+                                    </div>
+                               
+                                </div>
+                                {% if id == '0'%}
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label>Password :-</label>
+                                        <input type="password" class="form-control form-control-user" id="exampleInputPassword" name="password" placeholder="Password" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Repeat Password :-</label>
+                                        <input type="password"  class="form-control form-control-user" id="exampleRepeatPassword" name="repeatPassword" placeholder="Repeat Password" required>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <hr>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary btn-user ">
+                                        {% if id == '0' %}Register Account{% else %}Update User Details{% endif %}
+                                    </button>
+                                </div>     
+                                {% comment %} <div class="text-center">
+                                    <a class="small" href="/">Already have an account? Login!</a>
+                                </div> {% endcomment %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/mantra_io.min.js' %}"></script>
+
+  {% if messages %}
+    {% for message in messages %}
+      <script>
+      Swal.fire({
+        title: "{{ message.tags }}",
+        text: "{{ message }}",
+        icon: "{{ message.tags }}",
+        confirmButtonText: "OK",
+      });
+    </script>
+    {% endfor %}
+  {% endif %}
+
+  <script>
+    function validatePassword() {
+        var password = document.getElementById("exampleInputPassword").value;
+        var repeatPassword = document.getElementById("exampleRepeatPassword").value;
+        
+        if (password !== repeatPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Passwords do not match!',
+            });
+            return false;  // Prevent form submission
+        }
+        return true;  // Allow form submission
+    }
+</script>
+
+</body>
+
+</html>
