@@ -1,19 +1,21 @@
 
 How to host Django Application using gunicorn & nginx in Production:-
 
-git clone https://github.com/technowin/mantra_io.git
+git clone https://github.com/technowin/mantrainout.git
 
-cd mantra_io
+cd mantrainout
 
 git config credential.helper store
 
-git push https://github.com/technowin/mantra_io.git
+git push https://github.com/technowin/mantrainout.git
 
 sudo apt update
 
 sudo apt install python3-pip python3-dev nginx
 
 sudo pip3 install virtualenv
+
+sudo apt install python3-virtualenv
 
 virtualenv env
 
@@ -157,3 +159,4 @@ python manage.py startapp Workflow
 
 git config --global user.name "technowin"
 git config --global user.email "technowinitinfra@gmail.com"
+git remote add origin https://github.com/technowin/mantrainout.git
