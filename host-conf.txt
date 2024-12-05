@@ -29,7 +29,7 @@ sudo ufw allow 8000
 
 python3 manage.py runserver  172.26.13.184:8000     
 
-gunicorn --bind 172.26.13.184:8000 mantra_io.wsgi   
+gunicorn --bind 172.26.13.184:8000 mantrainout.wsgi   
 
 deactivate
 
@@ -58,8 +58,8 @@ After=network.target
 [Service]
 User=ubuntu
 Group=www-data
-WorkingDirectory=/home/ubuntu/mantra_io
-ExecStart=/home/ubuntu/mantra_io/env/bin/gunicorn \
+WorkingDirectory=/home/ubuntu/mantrainout
+ExecStart=/home/ubuntu/mantrainout/env/bin/gunicorn \
           --access-logfile - \
           --workers 3 \
           --bind unix:/run/gunicorn.sock \
@@ -71,17 +71,17 @@ WantedBy=multi-user.target
 sudo systemctl start gunicorn.socket
 sudo systemctl enable gunicorn.socket
 
-sudo vim /etc/nginx/sites-available/mantra_io
+sudo vim /etc/nginx/sites-available/mantrainout
 
 Enter i and then paste below part then for save Enter Esc :wq
 
 server {
     listen 80;
-    server_name 172.26.13.184;
+    server_name 172.26.14.175;
 
     location = /favicon.ico { access_log off; log_not_found off; }
     location /static/ {
-        root /home/ubuntu/mantra_io;
+        root /home/ubuntu/mantrainout;
     }
 
     location / {
@@ -90,7 +90,7 @@ server {
     }
 }
 
-sudo ln -s /etc/nginx/sites-available/mantra_io /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/mantrainout /etc/nginx/sites-enabled/
 
 cd /etc/nginx/sites-available/
 
