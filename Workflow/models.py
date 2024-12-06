@@ -5,8 +5,7 @@ from django.db import models
 class workflow(models.Model):
     id = models.AutoField(primary_key=True)
     dispatch_type =  models.TextField(null=True, blank=True)
-    inward_no =  models.TextField(null=True, blank=True)
-    outward_no =  models.TextField(null=True, blank=True)
+    dispatch_no =  models.TextField(null=True, blank=True)
     received_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     from_field = models.TextField(null=True, blank=True, db_column='from') 
     to =  models.TextField(null=True, blank=True)

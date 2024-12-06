@@ -1,0 +1,110 @@
+{% extends "Shared/Layout.html" %} {% block username %}{{username}}{% endblock %}
+{% block content %}
+{% load static %}
+{% csrf_token %}
+{% load custom_filters %}
+
+ <!-- Custom styles for this html-->
+<link rel="stylesheet" type="text/css" href="{% static 'css/tooltips.css' %}" />
+<link href="{% static 'css/table.css' %}" rel="stylesheet" type="text/css" >
+<link href="{% static 'css/masters.css' %}" rel="stylesheet" type="text/css" >
+<link href="{% static 'css/checkbox.css' %}" rel="stylesheet" type="text/css" >
+<script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    .table-container {
+        max-height: 100%; 
+        overflow-x: auto; 
+        overflow-y: auto; 
+        position: relative;
+    }
+    thead th {
+        position: sticky;
+        top: 0;
+        background-color: #fff;
+        z-index: 10; 
+    }
+    .card-body {
+        padding: 10px;
+        border: 2px solid #b3b3b3;
+        border-radius: 15px;
+        overflow: hidden; 
+    }
+    .swal2-confirm {
+        background-color: #4e73df !important; 
+        color: white !important;
+    }
+    
+</style>
+
+ <!-- Begin Page Content -->
+ <div>
+    <!-- Content Row -->
+    <div class="row mb-2" >
+        <!-- Dispatch Details -->
+        <div class="col-md-7" >
+            <div class="shadow " style="padding: 10px;border: 2px solid #b3b3b3;border-radius: 15px;">
+                <div class="card-header"> <h6 class="m-0 font-weight-bold text-primary">Dispatch Details</h6></div>
+                <div class="card-body" style="zoom:85%;height:400px;border: 2px solid #b3b3b3;">
+                    <div class="table-container">
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="col-md-5" style="margin-left:0px;">
+            <div class=" shadow " style="padding: 10px; border: 2px solid #b3b3b3;border-radius: 15px;">
+                <div class="card-header"> <h6 class="m-0 font-weight-bold text-primary">Documents</h6></div>
+                <div class="card-body" style="zoom:85%;height:400px;">
+                    <div class="table-container">
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<!-- Documents Modal -->
+<div class="modal fade" id="docs_model_id" >
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color:black">Uploaded Documents </h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+{% if messages %}
+  {% for message in messages %}
+    <script>
+    Swal.fire({
+      title: "{{ message.tags }}",
+      text: "{{ message }}",
+      icon: "{{ message.tags }}",
+      confirmButtonText: "OK",
+    });
+  </script>
+  {% endfor %}
+{% endif %}
+
+
+<!-- End of Main Content -->
+{% endblock %}
