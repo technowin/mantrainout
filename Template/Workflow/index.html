@@ -24,9 +24,30 @@
 </style>
 
  <!-- INDEX -->
- <div class="row col-lg-12 mb-2 shadow " style="padding: 10px;border: 2px solid #b3b3b3;border-radius: 15px;margin-left:0px;">
-    <div class="card-body" style="zoom:90%;">
-        <h1 style="color:#4e73df;font-weight:bold"><u> {{name}}</u></h2>
+ <div class="row col-lg-12 mb-2 shadow" style="padding: 10px;border: 2px solid #b3b3b3;border-radius: 15px;margin-left:0px;">
+    <div class="card-body" >
+      <div class="row col-lg-12">
+        <div class="col-lg-2">
+          <h1 style="color:#4e73df;font-weight:bold"><u> {{name}}</u> </h2>
+        </div>
+        <div class="col-lg-2">
+          <div class="dropdown" style="margin-top:5%">
+            <button class="btn btn-primary dropdown-toggle" type="button"
+                id="forward" data-toggle="dropdown" aria-haspopup="true"aria-expanded="false"> Dispatch Type
+            </button>
+            <div class="dropdown-menu animated--fade-in" aria-labelledby="forward" style="max-height: 200px; overflow-y: auto;">
+                {% for item in dt %}
+                    <a class="dropdown-item" value="{{item.0 |enc}}" href="/index?dt={{item.0 |enc}}">{{item.1}}</a>
+                {% endfor %}
+            </div>   
+          </div>
+        </div>
+        <div class="col-lg-7"></div>
+        <div class="col-lg-1">
+          <a href="/work_flow" style="font-size:16px;margin-top:5%" class="btn btn-md btn-primary">Create</a>
+        </div>
+      </div>
+          
         <div class="table-responsive">
             <table style="width: 100%;"  class="table"  id="dataTable">   
                 <thead>
@@ -49,13 +70,20 @@
                   {% for row in data %}
                       <tr style="color:black">
                           <td>{{ forloop.counter }}</td>
-                          <td>{{ row.5 }}</td>
-                          <td>{{ row.6 }}</td>
-                          <td>{{ row.7 }}</td>
-                          <td>{{ row.8 }}</td>
-                          <td>{{ row.11 }}</td>
-                          <td><span class="badge badge-pill badge-{{row.13}}" style="font-size: 16px;">{{ row.9 }}</span></td>
-                          <td><a href="/matrix_flow?wf={{row.0}}&af={{row.1}}&ac=action" style="font-size:16px;" class="btn btn-sm btn-primary">{{ row.10 }}</a></td>
+                          {% for cell in row %}
+                            {% if not forloop.first %}
+                                <td>
+                                    {% if cell|length > 60 %}
+                                        <!-- <textarea rows="4" readonly>{{ cell }}</textarea>  -->
+                                        {{ cell }}
+                                    {% else %}
+                                        {{ cell }}
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+
+                          {% endfor %}
+                          <td><a href="/work_flow?wf={{row.0}}" style="font-size:16px;" class="btn btn-md btn-primary">Edit</a></td>
                       </tr> 
                   {% endfor %}
                 </tbody>

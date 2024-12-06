@@ -65,7 +65,8 @@ def Login(request):
             request.session["full_name"]=(str(user.full_name))
             request.session["user_id"]=(str(user.id))
             request.session["role_id"] = str(user.role_id)
-            
+            if user.role_id in [2,3]:
+                return redirect('/index')
             if remember_me == 'on':
                 request.session.set_expiry(1209600)  # 2 weeks
             else:
@@ -88,7 +89,7 @@ def register_new_user(request):
        
         
         if id != '0':
-            id1 = decrypt_parameter(id)
+            id1 = dec(id)
             users = get_object_or_404(CustomUser, id=id1)
             full_name = users.full_name.split(" ", 1) 
             first_name = full_name[0] 

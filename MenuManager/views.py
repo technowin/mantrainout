@@ -66,7 +66,7 @@ def menu_admin(request):
             # Encrypt each row's ID before rendering
             data = []
             for row in rows:
-                encrypted_id = encrypt_parameter(str(row[0]))
+                encrypted_id = enc(str(row[0]))
                 data.append((encrypted_id,) + row[1:])
 
     except Exception as e:
@@ -89,7 +89,7 @@ def delete_menu(request):
         type = request.GET.get('type', '')
         if request.method == "POST" and type == 'delete':
             menu_id1 = request.POST.get('menu_id', '')
-            menu_id = decrypt_parameter(menu_id1)
+            menu_id = dec(menu_id1)
             try:
                 menu = get_object_or_404(MenuMaster, menu_id=menu_id)
                 menu.delete()
@@ -128,7 +128,7 @@ def menu_master(request):
         if request.method == "GET":
             menu_id = request.GET.get('menu_id', '')
             if menu_id != '0':
-                menu_id1 = decrypt_parameter(menu_id)
+                menu_id1 = dec(menu_id)
             menu = callproc("stp_get_dropdown_values",['menu'])
             roles = callproc("stp_get_dropdown_values",['roles'])
             users = callproc("stp_get_dropdown_values",['user'])
@@ -139,7 +139,7 @@ def menu_master(request):
         elif request.method == "POST" and type == 'create':
             menu_id = request.POST.get('menu_id', '')
             if menu_id != '0':
-                menu_id1 = decrypt_parameter(menu_id)
+                menu_id1 = dec(menu_id)
             fields = ['menu_name', 'menu_action', 'parent', 'menu_parent', 'sub_parent', 'sub_menu_parent', 'sub_parent1', 'sub_menu_parent1']
             menu_name, menu_action, parent, menu_parent, sub_parent, sub_menu_parent, sub_parent1, sub_menu_parent1= [request.POST.get(field, '') for field in fields]
 
@@ -333,7 +333,7 @@ def menu_order(request):
         if request.method=="GET":
             type = request.GET.get('type', '')
             menu_id = request.GET.get('menu_id', '')
-            menu_id1 = decrypt_parameter(menu_id)
+            menu_id1 = dec(menu_id)
             data = callproc("stp_get_menu_order",[menu_id1])
            
         if request.method=="POST":

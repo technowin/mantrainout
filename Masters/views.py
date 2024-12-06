@@ -67,7 +67,7 @@ def masters(request):
             data = []
             if (entity == 'menu' or entity == 'user') and type !='err': 
                 for row in rows:
-                    encrypted_id = encrypt_parameter(str(row[0]))
+                    encrypted_id = enc(str(row[0]))
                     data.append((encrypted_id,) + row[1:])
             else:data = rows
 

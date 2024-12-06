@@ -1,5 +1,5 @@
 from django.conf import settings
-from mantra_io.encryption import decrypt_parameter
+from mantra_io.encryption import dec
 import Db
 from .db_utils import callproc
 from django.utils import timezone

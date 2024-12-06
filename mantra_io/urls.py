@@ -22,6 +22,7 @@ from Dashboard.views import *
 from Masters.views import *
 from Reports.views import *
 from MenuManager.views import *
+from Workflow.views import *
 from django.urls import path
 
 urlpatterns = [
@@ -41,7 +42,11 @@ urlpatterns = [
     path("change_password",change_password, name="change_password"),
     path("forget_password_change",forget_password_change, name="forget_password_change"),
 
-    
+    # Workflow
+    path('index/', index, name='index'),
+    path('work_flow', work_flow, name='work_flow'),
+    path('download_doc/<str:filepath>/', download_doc, name='download_doc'), 
+
     # Masters
     path('masters/', masters, name='masters'),
 
