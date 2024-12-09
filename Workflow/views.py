@@ -62,7 +62,7 @@ def random_number(type):
 @login_required    
 def work_flow(request):
     data = []
-    context,wf_id  = '',''
+    context,wf_id,dispatch_no1  = '','',''
     try:
         if request.user.is_authenticated ==True:                
             global user,role_id
@@ -79,8 +79,10 @@ def work_flow(request):
             wf_id = dec(wf_id) if (wf_id := request.GET.get('wf', '')) else ''
             if wf_id: wf,enc_wfid = workflow.objects.get(id=wf_id),enc(wf_id)
             else: wf,enc_wfid='',''
-            header = callproc("stp_get_masters", ['wd','','header',wf_id])
-            rows = callproc("stp_get_masters",['wd','','data','1'])
+            if wf :def_dt = wf.dispatch_type
+            if wf :dispatch_no1 = wf.dispatch_no
+            header = callproc("stp_get_masters", ['wd','','header',dispatch_no1])
+            rows = callproc("stp_get_masters",['wd','','data',dispatch_no1])
             for row in rows:
                 if os.path.exists(os.path.join(MEDIA_ROOT, str(row[4]))):
                     encrypted_id = enc(str(row[4]))
@@ -93,15 +95,14 @@ def work_flow(request):
         if request.method == "POST":
             response = None
             wf_id = dec(wf_id) if (wf_id := request.POST.get('wf_id', '')) else ''
-            wf = workflow.objects.get(id=wf_id)
-            files = request.FILES.getlist('fileInput[]')          
-            for file in files:
-                 response =  docs_upload(file,role_id,user,wf)
+            if wf_id : wf = workflow.objects.get(id=wf_id) 
+            else: wf = ''
+            
+            files = request.FILES.getlist('fileInput')          
+            
             if(wf): dispatch_no =  request.POST.get('dispatch_no', '')
+            else: dispatch_no = ''
             disp_type =  request.POST.get('disp_type', '')
-            if disp_type == 'Inward' :type = 'IN-'
-            elif disp_type == 'Outward' :type = 'OUT-'
-            dispatch_no = random_number(type)
             received_date =  request.POST.get('received_date', '')
             from_field =  request.POST.get('from', '')
             to =  request.POST.get('to', '')
@@ -112,11 +113,17 @@ def work_flow(request):
             branch =  request.POST.get('branch', '')
             stakeholder =  request.POST.get('stakeholder', '')
 
-            r = callproc("stp_post_workflow", [disp_type,dispatch_no,received_date,from_field,to,subject,comment,department,send_user,branch,stakeholder])
-            if r[0][0] not in (""):
-                messages.success(request, str(r[0][0]))
+            r = callproc("stp_post_workflow", [disp_type,dispatch_no,received_date,from_field,to,subject,comment,department,send_user,branch,stakeholder,wf_id,user])
+            if r[0][0] == 'update':
+                for file in files:
+                    response =  docs_upload(file,role_id,user,dispatch_no)
+                messages.success(request, "Data Updated Successfully")
+            elif r[0][0] != "":
+                for file in files:
+                    response =  docs_upload(file,role_id,user,str(r[0][0]))
+                messages.success(request, "Data Added Successfully")
             else: messages.error(request, 'Oops...! Something went wrong!')
-            return redirect(f'/matrix_flow?wf={enc(wf_id)}')
+            return redirect(f'/index')
                 
     except Exception as e:
         tb = traceback.extract_tb(e.__traceback__)
@@ -151,37 +158,32 @@ def download_doc(request, filepath):
         callproc("stp_error_log", [fun, str(e), ''])  
         return HttpResponse("An error occurred while trying to download the file.", status=500)
     
-def docs_upload(file,role_id,user,wf,ser,name1):
+def docs_upload(file,role_id,user,dispatch_no1):
     file_resp = None
     role = roles.objects.get(id=role_id)
-    sub_path = f'{role.role_name}/user_{user}/workflow_{str(wf.id)}/{file.name}'
+    sub_path = f'{role.role_name}/User_{user}/{dispatch_no1}/{file.name}'
     full_path = os.path.join(MEDIA_ROOT, sub_path)
     folder_path = os.path.dirname(full_path)
     if not os.path.exists(folder_path):
         os.makedirs(folder_path, exist_ok=True)
     file_exists_in_folder = os.path.exists(full_path)
-    file_exists_in_db = workflow_document.objects.filter(file_path=sub_path,workflow=wf,name=name1).exists()
+    file_exists_in_db = workflow_document.objects.filter(file_path=sub_path,dispatch_no=dispatch_no1).exists()
     if file_exists_in_db:
-        document = workflow_document.objects.filter(file_path=sub_path,workflow=wf,name=name1).first()
+        document = workflow_document.objects.filter(file_path=sub_path,dispatch_no=dispatch_no1).first()
         document.updated_at = datetime.now()
         document.updated_by = str(user)
-        document.name=name1
         document.save()
         with open(full_path, 'wb+') as destination:
             for chunk in file.chunks():
                 destination.write(chunk)
-        if name1 =='':
-            file_resp =  f"File has been updated."
-        else: file_resp =  f"File '{file.name}' has been updated."
+        file_resp =  f"Files has been updated."
     else:
         with open(full_path, 'wb+') as destination:
             for chunk in file.chunks():
                 destination.write(chunk)
         workflow_document.objects.create(
-            workflow=wf, file_name=file.name,file_path=sub_path,name=name1,
+            dispatch_no=dispatch_no1, file_name=file.name,file_path=sub_path,
             created_at=datetime.now(),created_by=str(user),updated_at=datetime.now(),updated_by=str(user)
         )  
-        if name1 =='':
-            file_resp =  f"File has been inserted."
-        else: file_resp =  f"File '{file.name}' has been inserted."
+        file_resp =  f"Files has been inserted."
     return file_resp

@@ -9,6 +9,7 @@
 <link href="{% static 'css/table.css' %}" rel="stylesheet" type="text/css" >
 <link href="{% static 'css/masters.css' %}" rel="stylesheet" type="text/css" >
 <link href="{% static 'css/checkbox.css' %}" rel="stylesheet" type="text/css" >
+<link href="{% static 'css/workflow.css' %}" rel="stylesheet" type="text/css" >
 <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
@@ -16,34 +17,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-    .table-container {
-        max-height: 100%; 
-        overflow-x: auto; 
-        overflow-y: auto; 
-        position: relative;
-    }
-    thead th {
-        position: sticky;
-        top: 0;
-        background-color: #fff;
-        z-index: 10; 
-    }
-    .card-body {
-        padding: 10px;
-        border: 2px solid #b3b3b3;
-        border-radius: 15px;
-        overflow: hidden; 
-    }
-    .swal2-confirm {
-        background-color: #4e73df !important; 
-        color: white !important;
-    }
-    
+
 </style>
 
  <!-- Begin Page Content -->
  <form id="main_form" method="POST" enctype="multipart/form-data"  action="{% url 'work_flow' %}">
-
+    {% csrf_token %}
+    <input type="hidden" id="wfh_id" name="wf_id" value="{{wf_id}}" />
     <!-- Content Row -->
     <div class="row mb-2" >
         <!-- Dispatch Details -->
@@ -59,37 +39,37 @@
                                 <select id="disp_type" name="disp_type" class="form-control" style="border-color: black; border-radius: 10px; "  required>
                                     <option value="" disabled>Select</option>
                                     {% for item in dt %}
-                                        <option value="{{ item.0 }}" {% if item.0 == def_dt %}selected{% endif %} >{{ item.1 }}</option>
+                                        <option value="{{ item.0 }}" {% if item.0 == def_dt %}selected{% endif %}>{{ item.1 }}</option>
                                     {% endfor %}
                                 </select>                          
                             </div>
                             <div class="col-md-4">
                                 <label for="dispatch_no" id="dispatch_lbl" class="form-label">Inward No:</label>
-                                <input type="text" id="dispatch_no" name="dispatch_no" value="{% if wf %}{% else %}[Auto]{% endif %}" class="form-control" readonly>                   
+                                <input type="text" id="dispatch_no" name="dispatch_no" value="{% if wf %}{{wf.dispatch_no}}{% else %}[Auto]{% endif %}" class="form-control" readonly>                   
                             </div>
                             <div class="col-md-4">
                                 <label for="received_date" class="form-label">Received Date:</label>
-                                <input type="date" id="received_date" name = "received_date" value="" class="form-control" required>                   
+                                <input type="date" id="received_date" name = "received_date" value="{% if wf %}{{ wf.received_date|date:'Y-m-d' }}{% endif %}" class="form-control" required>                   
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="from" class="form-label">From:</label>
-                                <input type="text" id="from" name = "from" value="" class="form-control" required>                   
+                                <input type="text" id="from" name = "from" value="{% if wf %}{{wf.from_field}}{% endif %}" class="form-control" required>                   
                             </div>
                             <div class="col-md-4">
                                 <label for="to" class="form-label">To:</label>
-                                <input type="text" id="to" name = "to" value="" class="form-control" required>                   
+                                <input type="text" id="to" name = "to" value="{% if wf %}{{wf.to}}{% endif %}" class="form-control" required>                   
                             </div>
                             <div class="col-md-4">
                                 <label for="subject" class="form-label">Subject:</label>
-                                <input type="text" id="subject" name = "subject" value="" class="form-control" required>                   
+                                <input type="text" id="subject" name = "subject" value="{% if wf %}{{wf.subject}}{% endif %}" class="form-control" required>                   
                             </div>
                         </div>
                         <div class="row mb-3 justify-content-center">
                             <div class="col-md-4">
                                 <label for="comment" class="">Comment:</label>
-                                <textarea rows="3" cols="10" id="comment" name="comment" value="" placeholder="Write your comments here..." class="form-control" style="border-color: black; border-radius: 10px; "></textarea>
+                                <textarea rows="3" cols="10" id="comment" name="comment" value="{% if wf %}{{wf.comment}}{% endif %}" placeholder="Write your comments here..." class="form-control" style="border-color: black; border-radius: 10px; " required>{% if wf %}{{wf.comment}}{% endif %}</textarea>
                             </div>
                         </div>
                     </div>
@@ -101,61 +81,56 @@
         <div class="col-md-5" style="margin-left:0px;">
             <div class=" shadow " style="padding: 10px; border: 2px solid #b3b3b3;border-radius: 15px;">
                 <div class="card-header"> <h5 class="m-0 font-weight-bold text-primary">Documents</h5></div>
-                <div class="card-body" style="height:400px;">
-                    <div class="table-container">
-                        <br>
-                        <div class="row mb-3 justify-content-center">
-                            <div class="col-md-4">
-                                <label for="fileInput" style="font-size:18px;" class="">Attachment:</label>
-                                <input type="file" id="fileInput" name="fileInput[]" class="" style="border-color: black; border-radius: 10px;" multiple required />
-                            </div>
-                            <div class="col-md-4">
-                            </div>
-                            <div class="col-md-4">
-                                <br>
-                                <button type="button" id="Btn3" class="btn btn-primary" style="margin-top:8%" data-toggle="modal" data-target="#docs_model_id" >Uploaded Docs</button>
-                            </div>
+                <div class="card-body formupl" style="height:400px;">
+                    <div class="table-container ">
+                       
+                        <div class="">
+                            <a type="button" id="Btn3" class="btn btn-primary" style="margin-top:8%" data-toggle="modal" data-target="#docs_model_id" >Uploaded Docs</a>
+                            <label for="file-input1" class="drop-container">
+                                <span class="drop-title">Drop files here</span>or
+                                <input type="file" id="file-input1" class="file-input" name="fileInput" multiple >
+                            </label>
                         </div>
-                        <br>
-                        <div id = "in_div" style="{% if def_dt != "Inward" %}display:none{% endif %}">
+                      
+                        <div id = "in_div" style="text-align:left;{% if def_dt != "Inward" %}display:none{% endif %}">
                             <div class="row mb-3 justify-content-center" >
                                 <div class="col-md-6">
                                     <label for="department" class="form-label">Department:</label>
-                                    <select  id="department" name="department" class="form-control" style="border-color: black; border-radius: 10px; "  required>
+                                    <select id="department" name="department" class="form-control" style="border-color: black; border-radius: 10px;">
                                         <option value="" selected disabled>Select</option>
                                         {% for item in dp %}
-                                            <option value="{{ item.0 }}" {% if item.0 == def_dt %}selected{% endif %} >{{ item.1 }}</option>
+                                            <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.department %}selected{% endif %}>{{ item.1 }}</option>
                                         {% endfor %}
-                                    </select>                          
+                                    </select>                                                             
                                 </div>
                                 <div class="col-md-6">
                                     <label for="send_user" class="form-label">Send-User:</label>
-                                    <select  id="send_user" name="send_user" class="form-control" style="border-color: black; border-radius: 10px; "  required>
+                                    <select  id="send_user" name="send_user" class="form-control" style="border-color: black; border-radius: 10px; " >
                                         <option value=""  selected disabled>Select</option>
                                         {% for item in su %}
-                                            <option value="{{ item.0 }}" {% if item.0 == def_dt %}selected{% endif %} >{{ item.1 }}</option>
+                                            <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.send_user %}selected{% endif %} >{{ item.1 }}</option>
                                         {% endfor %}
                                     </select>                          
                                 </div>
                             </div>
                         </div>
-                        <div id = "out_div" style="{% if def_dt != "Outward" %}display:none{% endif %}">
+                        <div id = "out_div" style="text-align:left;{% if def_dt != "Outward" %}display:none{% endif %}">
                             <div class="row mb-3 justify-content-center">
                                 <div class="col-md-6">
                                     <label for="branch" class="form-label">Branch:</label>
-                                    <select  id="branch" name="branch" class="form-control" style="border-color: black; border-radius: 10px; "  required>
+                                    <select  id="branch" name="branch" class="form-control" style="border-color: black; border-radius: 10px; " >
                                         <option value="" selected  disabled>Select</option>
                                         {% for item in bh %}
-                                            <option value="{{ item.0 }}" {% if item.0 == def_dt %}selected{% endif %} >{{ item.1 }}</option>
+                                            <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.branch %}selected{% endif %} >{{ item.1 }}</option>
                                         {% endfor %}
                                     </select>                          
                                 </div>
                                 <div class="col-md-6">
                                     <label for="stakeholder" class="form-label">Stakeholder:</label>
-                                    <select  id="stakeholder" name="stakeholder" class="form-control" style="border-color: black; border-radius: 10px; "  required>
+                                    <select  id="stakeholder" name="stakeholder" class="form-control" style="border-color: black; border-radius: 10px; " >
                                         <option value="" selected  disabled>Select</option>
                                         {% for item in sh %}
-                                            <option value="{{ item.0 }}" {% if item.0 == def_dt %}selected{% endif %} >{{ item.1 }}</option>
+                                            <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.stakeholders %}selected{% endif %} >{{ item.1 }}</option>
                                         {% endfor %}
                                     </select>                          
                                 </div>
@@ -168,10 +143,10 @@
     </div>
     <div class="row col-lg-12 mb-2 shadow justify-content-center" style="padding: 10px;text-align:center;border: 2px solid #b3b3b3;border-radius: 15px;margin-left:0px;align-items:center;justify-items:center;">
         <div class="col-md-3" style="">
-            <button type="submit" id="Btn3" class="btn btn-primary"  >Submit</button>
+            <button type="submit" id="submitBtn" class="btn btn-primary"  >{% if wf %}Update{% else %}Submit{% endif %}</button>
         </div>
         <div class="col-md-2">
-            <a type="button" href="/index" id="Btn3" class="btn btn-primary">Back</a>
+            <a type="button" href="/index" id="backBtn" class="btn btn-primary">Back</a>
         </div>
     </div>
 </form>
@@ -236,6 +211,46 @@
   </script>
   {% endfor %}
 {% endif %}
+
+<script>
+    // Handle form submission
+    $("#submitBtn").click(function () {
+        debugger;
+        const selectedType = $("#disp_type").val();
+        let isValid = false;
+
+        if (selectedType === "Inward") {
+            const input1 = $("#department").val();
+            const input2 = $("#send_user").val();
+
+            if (input1 || input2) {
+                isValid = true;
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Required',
+                    text: 'Please select at least one option from the Department or Send User dropdown.',
+                });
+                return false; 
+            }
+        } else if (selectedType === "Outward") {
+            const input3 = $("#branch").val();
+            const input4 = $("#stakeholder").val();
+
+            if (input3 || input4) {
+                isValid = true;
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Required',
+                    text: 'Please select at least one option from the Branch or Stakeholder dropdown.',
+                });
+                return false; 
+            }
+        } 
+    });
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

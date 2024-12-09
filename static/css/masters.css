@@ -280,11 +280,11 @@
 
 
     .formupl {
-      background-color: #fff;
+      /* background-color: #fff; */
       box-shadow: 0 10px 60px rgb(218, 229, 255);
       border: 1px solid rgb(159, 159, 160);
       border-radius: 20px;
-      padding: 2rem .7rem .7rem .7rem;
+      padding: 0rem .7rem .7rem .7rem;
       text-align: center;
       font-size: 1.125rem;
       /* max-width: 390px; */
@@ -311,7 +311,7 @@
       justify-content: center;
       align-items: center;
       padding: 10px;
-      margin-top: 2.1875rem;
+      margin-top: 1rem;
       border-radius: 10px;
       border: 2px dashed rgb(171, 202, 255);
       color: #444;
