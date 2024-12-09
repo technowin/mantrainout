@@ -37,7 +37,7 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="disp_type" class="form-label">Dispatch Type:</label>
-                                <select id="disp_type" name="disp_type" class="form-control" style="border-color: black; border-radius: 10px; "  required>
+                                <select id="disp_type" name="disp_type" class="form-control" style="border-color: black; border-radius: 10px; " {% if wf %}disabled{% else %}required{% endif %} >
                                     <option value="" disabled>Select</option>
                                     {% for item in dt %}
                                         <option value="{{ item.0 }}" {% if item.0 == def_dt %}selected{% endif %}>{{ item.1 }}</option>
