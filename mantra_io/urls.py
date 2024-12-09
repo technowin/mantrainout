@@ -44,6 +44,8 @@ urlpatterns = [
 
     # Workflow
     path('index/', index, name='index'),
+    path('partial_table', partial_table, name='partial_table'),
+    path('download_xls', download_xls, name='download_xls'),
     path('work_flow', work_flow, name='work_flow'),
     path('download_doc/<str:filepath>/', download_doc, name='download_doc'), 
 

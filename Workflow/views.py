@@ -21,8 +21,10 @@ import calendar
 from django.utils import timezone
 from datetime import timedelta
 # Create your views here.
-
-
+from django.template.loader import render_to_string
+import time
+import xlsxwriter
+import io
 @login_required 
 def index(request):
     pre_url = request.META.get('HTTP_REFERER')
@@ -35,17 +37,22 @@ def index(request):
                 role_id = request.user.role_id
         if request.method == "GET":
             disp_type = callproc("stp_get_dropdown_values",['disp_type'])
+            dp = callproc("stp_get_dropdown_values",['dept'])
+            su = callproc("stp_get_dropdown_values",['send_user'])
+            bh = callproc("stp_get_dropdown_values",['branch'])
+            sh = callproc("stp_get_dropdown_values",['stakeholder'])
             datalist1= callproc("stp_get_masters",['wf','','name',user])
             name = datalist1[0][0]
             if role_id == 2 :def_dt = 'Inward'
             elif role_id == 3 :def_dt = 'Outward'
+            
             dt = dec(dt) if (dt := request.GET.get('dt', '')) else def_dt
             header = callproc("stp_get_masters", ['wf',dt,'header',user])
             rows = callproc("stp_get_masters",['wf',dt,'data',user])
             for row in rows:
                 id = enc(str(row[0]))
                 data.append((id,) + row[1:])
-        context = {'role_id':role_id,'name':name,'header':header,'data':data,'user_id':request.user.id,'dt':disp_type}
+        context = {'role_id':role_id,'name':name,'header':header,'data':data,'user_id':request.user.id,'dt':disp_type,'su':su,'dp':dp,'bh':bh,'sh':sh,'def_dt':def_dt}
     except Exception as e:
         tb = traceback.extract_tb(e.__traceback__)
         fun = tb[0].name
@@ -54,11 +61,39 @@ def index(request):
     finally: 
          return render(request,'Workflow/index.html', context)
     
-import random
 
-def random_number(type):
-    random_number = random.randint(1000, 9999)
-    result = f"{type}{random_number}"
+@login_required
+def partial_table(request):
+    data = []
+    try:
+        if request.user.is_authenticated ==True:                
+            global user
+            user = request.user.id    
+            role_id = request.user.role_id
+            if request.method == "GET":
+                dt = request.GET.get('dt', '')
+                if(dt!=''):
+                    ca = request.GET.get('ca', '')
+                    dp = request.GET.get('dp', '')
+                    su = request.GET.get('su', '')
+                    bh = request.GET.get('bh', '')
+                    sh = request.GET.get('sh', '')
+                    header = callproc("stp_get_masters", ['wf',dt,'header',user])
+                    rows = callproc("stp_get_workflow",[dt,dp,su,bh,sh,ca,user,'data'])
+                    for row in rows:
+                        id = enc(str(row[0]))
+                        data.append((id,) + row[1:])
+                context = {'header':header,'data':data}
+                html = render_to_string('Workflow/_partial_table.html', context)
+    except Exception as e:
+        tb = traceback.extract_tb(e.__traceback__)
+        fun = tb[0].name
+        callproc("stp_error_log",[fun,str(e),request.user.id])  
+        messages.error(request, 'Oops...! Something went wrong!')
+    finally:
+        data = {'html': html}
+        return JsonResponse(data, safe=False)
+    
 @login_required    
 def work_flow(request):
     data = []
@@ -134,7 +169,6 @@ def work_flow(request):
          if request.method == "GET" :
             return render(request,'Workflow/workflow.html', context)
 
-
 def download_doc(request, filepath):
     file = dec(filepath)
     file_path = os.path.join(settings.MEDIA_ROOT, file)
@@ -187,3 +221,53 @@ def docs_upload(file,role_id,user,dispatch_no1):
         )  
         file_resp =  f"Files has been inserted."
     return file_resp
+ 
+@login_required
+def download_xls(request):
+    response = ''
+    try:
+        if request.user.is_authenticated ==True:                
+            global user,role_id
+            user = request.user.id   
+            role_id = request.user.role_id  
+            if request.method == "POST":
+                dt =str(request.POST.get('disp_typeh', ''))
+                ca =str(request.POST.get('created_ath', ''))
+                dp =str(request.POST.get('departmenth', ''))
+                su =str(request.POST.get('send_userh', ''))
+                bh =str(request.POST.get('branchh', ''))
+                sh =str(request.POST.get('stakeholderh', ''))
+
+                header = callproc("stp_get_masters", ['wf',dt,'sample_xlsx',user])
+                rows = callproc("stp_get_workflow",[dt,dp,su,bh,sh,ca,user,'xls'])
+                output = io.BytesIO()
+                workbook = xlsxwriter.Workbook(output)
+                worksheet = workbook.add_worksheet(str(dt) + ' Report')
+
+                worksheet.insert_image('A1', 'static/images/technologo1.png', {'x_offset': 10, 'y_offset': 10, 'x_scale': 0.5, 'y_scale': 0.5})
+
+                header_format = workbook.add_format({'align': 'center', 'bold': True, 'font_size': 14})
+                data_format = workbook.add_format({'border': 1})
+                worksheet.merge_range('A1:Z1', dt +' Report', workbook.add_format({'bold': True, 'align': 'center', 'font_size': 16}))
+
+                # worksheet.merge_range('A4:{}'.format(chr(65+len(header)-1)+'2'), dt + ' Report', header_format)
+
+                header_format = workbook.add_format({'bold': True, 'bg_color': '#DD8C8D', 'font_color': 'black'})
+                for i, column_name in enumerate(header):
+                    worksheet.write(6, i, column_name, header_format)
+
+                for row_num, row_data in enumerate(rows, start=7):
+                    for col_num, col_data in enumerate(row_data):
+                        worksheet.write(row_num, col_num, col_data, data_format)
+                workbook.close()
+                response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                response['Content-Disposition'] = 'attachment; filename="' + str(dt) + ' Report' + '.xlsx"'
+                output.seek(0)
+                response.write(output.read())
+    except Exception as e:
+        tb = traceback.extract_tb(e.__traceback__)
+        fun = tb[0].name
+        callproc("stp_error_log",[fun,str(e),request.user.id])  
+        messages.error(request, 'Oops...! Something went wrong!')
+    finally:
+        return response

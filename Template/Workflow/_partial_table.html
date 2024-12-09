@@ -1,0 +1,41 @@
+<table style="width: 100%;"  class="table"  id="dataTable">   
+    <thead>
+        <tr>
+            {% for col in header %}
+                {% if not forloop.first %}
+                    <th style="font-weight: bold; color: black; {% if col.1 != "" %} width: {{ col.1 }};{% endif %}">{{ col.0 }}</th>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for col in header %}
+                {% if not forloop.first %}
+                    <th> </th>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>  
+      {% for row in data %}
+          <tr style="color:black">
+              <td>{{ forloop.counter }}</td>
+              {% for cell in row %}
+                {% if not forloop.first %}
+                    <td>
+                        {% if 'IN-00' in cell or 'OUT-00' in cell %}
+                            <span class="badge badge-pill badge-secondary" style="font-size: 16px;">{{ cell }}</span>
+                        {% elif cell|length > 60 %}
+                            <!-- <textarea rows="4" readonly>{{ cell }}</textarea>  -->
+                            {{ cell }}
+                        {% else %}
+                            {{ cell }}
+                        {% endif %}
+                    </td>
+                {% endif %}
+
+              {% endfor %}
+              <td><a href="/work_flow?wf={{row.0}}" style="font-size:16px;" class="btn btn-md btn-primary">Edit</a></td>
+          </tr> 
+      {% endfor %}
+    </tbody>
+</table>

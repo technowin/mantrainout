@@ -22,6 +22,7 @@
         overflow: hidden; 
     }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" /><link rel="stylesheet" type="text/css" href="{% static 'css/report.css' %}" />
 
  <!-- INDEX -->
  <div class="row col-lg-12 mb-2 shadow" style="padding: 10px;border: 2px solid #b3b3b3;border-radius: 15px;margin-left:0px;">
@@ -30,8 +31,8 @@
         <div class="col-lg-2">
           <h2 style="color:#4e73df;font-weight:bold"><u> {{name}}</u> </h2>
         </div>
-        <div class="col-lg-2">
-          <div class="dropdown" style="margin-top:5%">
+        <div class="col-lg-3" style="margin-top:0.2%">
+          <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button"
                 id="forward" data-toggle="dropdown" aria-haspopup="true"aria-expanded="false"> Dispatch Type
             </button>
@@ -42,13 +43,28 @@
             </div>   
           </div>
         </div>
-        <div class="col-lg-7"></div>
-        <div class="col-lg-1">
-          <a href="/work_flow" style="font-size:16px;margin-top:5%" class="btn btn-md btn-primary">Create</a>
+        <div class="col-lg-3" style="margin-top:0.2%">
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filterModal">Filter Options</button>       
+         </div>
+         <div class="col-lg-3" style="margin-top:0.2%">
+            <form action="/download_xls" method="post" id="downloadExcel" class="form-horizontal" role="form" autocomplete="off" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="hidden" id="disp_typeh" name="disp_typeh" value="">
+              <input type="hidden" id="created_ath" name="created_ath" value="">
+              <input type="hidden" id="departmenth" name="departmenth" value="">
+              <input type="hidden" id="send_userh" name="send_userh" value="">
+              <input type="hidden" id="branchh" name="branchh" value="">
+              <input type="hidden" id="stakeholderh" name="stakeholderh" value="">
+              <button type="submit" value="Excel" class="btn btn-primary" id="btn_excel">Download &nbsp; <i class="fa fa-file-excel"></i></button>
+            </form>
+         </div>
+        {% comment %} <div class="col-lg-2"></div> {% endcomment %}
+        <div class="col-lg-1" style="margin-top:0.2%">
+          <a href="/work_flow" style="font-size:16px;" class="btn btn-md btn-primary">Create</a>
         </div>
       </div>
           
-        <div class="table-responsive">
+        <div class="table-responsive" id = "tbl_div">
             <table style="width: 100%;"  class="table"  id="dataTable">   
                 <thead>
                     <tr>
@@ -73,7 +89,9 @@
                           {% for cell in row %}
                             {% if not forloop.first %}
                                 <td>
-                                    {% if cell|length > 60 %}
+                                    {% if 'IN-00' in cell or 'OUT-00' in cell %}
+                                        <span class="badge badge-pill badge-secondary" style="font-size: 16px;">{{ cell }}</span>
+                                    {% elif cell|length > 60 %}
                                         <!-- <textarea rows="4" readonly>{{ cell }}</textarea>  -->
                                         {{ cell }}
                                     {% else %}
@@ -91,6 +109,90 @@
         </div>
     </div>
 </div>
+ 
+ <!-- Modal -->
+ <div class="modal fade" id="filterModal">
+  <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable" role="document" >
+    <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="filterModalLabel" style="color:black">Filter Options</h5>
+              <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <form id="filterForm" class="formupl p-3" >
+                  <!-- Category Filter -->
+                  <div class="row mb-3 justify-content-center"  style="text-align:left;">
+                    <div class="col-md-6">
+                      <label for="disp_type" class="form-label">Dispatch Type:</label>
+                      <select id="disp_type" name="disp_type" class="form-control" style="border-color: black; border-radius: 10px; " {% if wf %}disabled{% else %}required{% endif %} >
+                          <option value="" disabled>Select</option>
+                          {% for item in dt %}
+                              <option value="{{ item.0 }}" {% if item.0 == def_dt %}selected{% endif %}>{{ item.1 }}</option>
+                          {% endfor %}
+                      </select>                          
+                  </div>
+                    <div class="col-md-6">
+                      <label for="send_user" id="created_atlbl" class="form-label">Inward Date:</label>
+                      <input type="date" id="created_at" name = "created_at" value="" class="form-control" >                                         
+                    </div>
+                  </div>
+                  <div id = "in_div" style="text-align:left;{% if def_dt != "Inward" %}display:none{% endif %}">
+                    <div class="row mb-3 justify-content-center" >
+                        <div class="col-md-6">
+                            <label for="department" class="form-label">Department:</label>
+                            <select id="department" name="department" class="form-control" style="border-color: black; border-radius: 10px;">
+                                <option value="" selected disabled>Select</option>
+                                {% for item in dp %}
+                                    <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.department %}selected{% endif %}>{{ item.1 }}</option>
+                                {% endfor %}
+                            </select>                                                             
+                        </div>
+                        <div class="col-md-6">
+                            <label for="send_user" class="form-label">Send-User:</label>
+                            <select  id="send_user" name="send_user" class="form-control" style="border-color: black; border-radius: 10px; " >
+                                <option value=""  selected disabled>Select</option>
+                                {% for item in su %}
+                                    <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.send_user %}selected{% endif %} >{{ item.1 }}</option>
+                                {% endfor %}
+                            </select>                          
+                        </div>
+                    </div>
+                </div>
+                <div id = "out_div" style="text-align:left;{% if def_dt != "Outward" %}display:none{% endif %}">
+                    <div class="row mb-3 justify-content-center">
+                        <div class="col-md-6">
+                            <label for="branch" class="form-label">Branch:</label>
+                            <select  id="branch" name="branch" class="form-control" style="border-color: black; border-radius: 10px; " >
+                                <option value="" selected  disabled>Select</option>
+                                {% for item in bh %}
+                                    <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.branch %}selected{% endif %} >{{ item.1 }}</option>
+                                {% endfor %}
+                            </select>                          
+                        </div>
+                        <div class="col-md-6">
+                            <input type="hidden" id="shh_id" name="shh_id" value="{{wf.stakeholders}}" />
+                            <label for="stakeholder" class="form-label">Stakeholder:</label>
+                            <select  id="stakeholder" name="stakeholder" class="form-control"  style="border-color: black; border-radius: 10px; " >
+                                <option value="" selected  disabled>Select</option>
+                                {% for item in sh %}
+                                    <option value="{{ item.0 }}" >{{ item.1 }}</option>
+                                {% endfor %}
+                            </select>     
+                        </div>
+                    </div>
+                </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-danger" onclick="clearFilters()">Clear Filters</button>
+              <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+          </div>
+      </div>
+  </div>
+</div>
+
 
 {% if messages %}
   {% for message in messages %}
@@ -105,52 +207,117 @@
   {% endfor %}
 {% endif %}
 
-
 <script type="text/javascript">
-    $(document).ready(function () {
-      $("#dataTable").DataTable({
-        //order: [[0, 'desc']],
-        "ordering": false,
-        initComplete: function () {
-          this.api()
-            .columns()
-            .every(function () {
-              var column = this;
-              var select = $(
-                '<select style="width:100%;border-radius: 10px;background-color:whitesmoke ;color: black;"><option value="">All</option></select>'
-              )
-                .appendTo($(column.header()).empty())
-                .on("change", function () {
-                  var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                  column.search(val ? "^" + val + "$" : "", true, false).draw();
-                });
-              column
-                .data()
-                .unique()
-                .sort()
-                .each(function (d, j) {
-                  var ce = d;
-                  if (
-                    ce.includes("<a") ||
-                    ce.includes("span") ||
-                    ce.includes("<input") ||
-                    ce.includes("select") ||
-                    ce.includes("textarea")
-                  ) {
-                  } else {
-                    select.append('<option value="' + d + '">' + d + "</option>");
-                  }
-                });
-            });
-        },
-        pageLength: 10,
-        lengthMenu: [
-          [5, 10, 25, 50, 100, 200, 300, 400, 500, -1],
-          [5, 10, 25, 50, 100, 200, 300, 400, 500, "All"],
-        ],
-      });
+  function initializeDataTable() {
+    $("#dataTable").DataTable({
+      //order: [[0, 'desc']],
+      "ordering": false,
+      initComplete: function () {
+        this.api()
+          .columns()
+          .every(function () {
+            var column = this;
+            var select = $(
+              '<select style="width:100%;border-radius: 10px;background-color:whitesmoke ;color: black;"><option value="">All</option></select>'
+            )
+              .appendTo($(column.header()).empty())
+              .on("change", function () {
+                var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                column.search(val ? "^" + val + "$" : "", true, false).draw();
+              });
+            column
+              .data()
+              .unique()
+              .sort()
+              .each(function (d, j) {
+                var ce = d;
+                if (
+                  ce.includes("<a") ||
+                  ce.includes("span") ||
+                  ce.includes("<input") ||
+                  ce.includes("select") ||
+                  ce.includes("textarea")
+                ) {
+                } else {
+                  select.append('<option value="' + d + '">' + d + "</option>");
+                }
+              });
+          });
+      },
+      pageLength: 10,
+      lengthMenu: [
+        [5, 10, 25, 50, 100, 200, 300, 400, 500, -1],
+        [5, 10, 25, 50, 100, 200, 300, 400, 500, "All"],
+      ],
     });
-  </script>
+  }
+  $(document).ready(function () {
+    initializeDataTable();
+  });
+</script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const dispType = document.getElementById('disp_type');
+      const created_atlbl = document.getElementById('created_atlbl');
+      const inDiv = document.getElementById('in_div');
+      const outDiv = document.getElementById('out_div');
+      dispType.addEventListener('change', () => {
+          const selectedValue = dispType.value;
+          created_atlbl.innerText = selectedValue === 'Inward' ? 'Inward Date:' : selectedValue === 'Outward' ? 'Outward Date:' :'No:';
+          inDiv.style.display = selectedValue === 'Inward' ? 'block' : 'none';
+          outDiv.style.display = selectedValue === 'Outward' ? 'block' : 'none';
+      });
+  });
+</script>
+
+<script>
+  function applyFilters() {
+   
+      var dt = document.getElementById('disp_type').value;
+      var ca = document.getElementById('created_at').value;
+      var dp = document.getElementById('department').value;
+      var su = document.getElementById('send_user').value;
+      var bh = document.getElementById('branch').value;
+      var sh = document.getElementById('stakeholder').value;
+      if(disp_type && disp_type!="" )
+      {
+        $.ajax({
+          url: "/partial_table",
+          data: {'dt': dt,'ca': ca,'dp': dp,'su': su,'bh': bh,'sh': sh,},
+          success: function (data) {
+            debugger;
+              $("#dataTable").DataTable().destroy();
+              $("#tbl_div").empty().append(data.html);
+              initializeDataTable();
+          }
+        });
+        $('#filterModal').modal('hide');
+      }
+  }
+
+  function clearFilters() {
+    document.getElementById('filterForm').reset();
+    document.getElementById('downloadExcel').reset();
+}
+
+$("#btn_excel").click(function () {
+  const disp_type = document.getElementById('disp_type').value;
+  const created_at = document.getElementById('created_at').value;
+  const department = document.getElementById('department').value;
+  const send_user = document.getElementById('send_user').value;
+  const branch = document.getElementById('branch').value;
+  const stakeholder = document.getElementById('stakeholder').value;
+
+  $("#disp_typeh").val(disp_type);
+  $("#created_ath").val(created_at);
+  $("#departmenth").val(department);
+  $("#send_userh").val(send_user);
+  $("#branchh").val(branch);
+  $("#stakeholderh").val(stakeholder);
+  $("#downloadExcel").submit();
+})
+
+</script>
 
 {% endblock %}
