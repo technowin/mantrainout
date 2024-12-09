@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <style>
 
 </style>
@@ -127,12 +128,12 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label for="stakeholder" class="form-label">Stakeholder:</label>
-                                    <select  id="stakeholder" name="stakeholder" class="form-control" style="border-color: black; border-radius: 10px; " >
+                                    <select  id="stakeholder" name="stakeholder"  style="border-color: black; border-radius: 10px; " >
                                         <option value="" selected  disabled>Select</option>
                                         {% for item in sh %}
-                                            <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.stakeholders %}selected{% endif %} >{{ item.1 }}</option>
+                                            <option value="{{ item.0 }}" >{{ item.1 }}</option>
                                         {% endfor %}
-                                    </select>                          
+                                    </select>     
                                 </div>
                             </div>
                         </div>
@@ -150,6 +151,11 @@
         </div>
     </div>
 </form>
+
+ <!-- Selectize css -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css">
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+ 
 <!-- Documents Modal -->
 <div class="modal fade" id="docs_model_id" >
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document" >
@@ -211,6 +217,29 @@
   </script>
   {% endfor %}
 {% endif %}
+
+<script>
+    $(document).ready(function () {
+        var selectedValue = "{{ wf.stakeholders }}"; // Pre-selected value for edit form
+        
+        var selectizeControl = $('#stakeholder').selectize({
+            plugins: [], // Remove the 'remove_button' plugin as it's for multi-select
+            persist: false,
+            create: true, // Allow adding new options
+            maxItems: 1, // Limit to a single selection
+            selectOnTab: true, // Select the item when pressing Tab
+            onInitialize: function () {
+                console.log('Selectize initialized!');
+            }
+        });
+        
+        // Set the pre-selected value for edit mode
+        var selectizeInstance = selectizeControl[0].selectize; // Access the Selectize instance
+        if (selectedValue) {
+            selectizeInstance.setValue(selectedValue);
+        }
+    });    
+</script>
 
 <script>
     // Handle form submission
