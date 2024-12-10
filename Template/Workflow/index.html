@@ -126,18 +126,19 @@
                     <div class="col-md-6">
                       <label for="disp_type" class="form-label">Dispatch Type:</label>
                       <select id="disp_type" name="disp_type" class="form-control" style="border-color: black; border-radius: 10px; " {% if wf %}disabled{% else %}required{% endif %} >
-                          <option value="" disabled>Select</option>
+                          <option value="All">Select</option>
                           {% for item in dt %}
-                              <option value="{{ item.0 }}" {% if item.0 == def_dt %}selected{% endif %}>{{ item.1 }}</option>
+                              <option value="{{ item.0 }}">{{ item.1 }}</option>
                           {% endfor %}
                       </select>                          
                   </div>
                     <div class="col-md-6">
-                      <label for="send_user" id="created_atlbl" class="form-label">Inward Date:</label>
+                      <label for="send_user" id="created_atlbl" class="form-label">Dispatch Date:</label>
                       <input type="date" id="created_at" name = "created_at" value="" class="form-control" >                                         
                     </div>
                   </div>
-                  <div id = "in_div" style="text-align:left;{% if def_dt != "Inward" %}display:none{% endif %}">
+                  {% comment %} <div id = "in_div" style="text-align:left;{% if def_dt != "Inward" %}display:none{% endif %}"> {% endcomment %}
+                  <div id = "in_div" style="text-align:left;">
                     <div class="row mb-3 justify-content-center" >
                         <div class="col-md-6">
                             <label for="department" class="form-label">Department:</label>
@@ -159,7 +160,8 @@
                         </div>
                     </div>
                 </div>
-                <div id = "out_div" style="text-align:left;{% if def_dt != "Outward" %}display:none{% endif %}">
+                {% comment %} <div id = "out_div" style="text-align:left;{% if def_dt != "Outward" %}display:none{% endif %}"> {% endcomment %}
+                  <div id = "out_div" style="text-align:left;">
                     <div class="row mb-3 justify-content-center">
                         <div class="col-md-6">
                             <label for="branch" class="form-label">Branch:</label>
@@ -264,9 +266,18 @@
       const outDiv = document.getElementById('out_div');
       dispType.addEventListener('change', () => {
           const selectedValue = dispType.value;
-          created_atlbl.innerText = selectedValue === 'Inward' ? 'Inward Date:' : selectedValue === 'Outward' ? 'Outward Date:' :'No:';
-          inDiv.style.display = selectedValue === 'Inward' ? 'block' : 'none';
-          outDiv.style.display = selectedValue === 'Outward' ? 'block' : 'none';
+          created_atlbl.innerText = selectedValue === 'Inward' ? 'Inward Date:' : selectedValue === 'Outward' ? 'Outward Date:' :'Dispatch Date:';
+          if(selectedValue == "All")
+          {
+            inDiv.style.display = 'block';
+            outDiv.style.display = 'block';
+          }
+          else
+          {
+            inDiv.style.display = selectedValue === 'Inward' ? 'block' : 'none';
+            outDiv.style.display = selectedValue === 'Outward' ? 'block' : 'none';
+          }
+         
       });
   });
 </script>
