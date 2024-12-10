@@ -143,9 +143,9 @@ python manage.py makemigrations
 python manage.py migrate
 
 
-
+# file size restriction
 sudo vim /etc/nginx/nginx.conf
-
+client_max_body_size 100M;
 
 python manage.py makemigrations Account
 python manage.py makemigrations Masters
