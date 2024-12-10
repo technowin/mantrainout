@@ -63,6 +63,77 @@
           <a href="/work_flow" style="font-size:16px;" class="btn btn-md btn-primary">Create</a>
         </div>
       </div>
+      <div style="display: none;" id="loderDiv" class="my-loader">
+        <div class="rubiks-cube">
+            <div class="face front">
+                <div style="background: #ff3d00;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+                <div style="background: #ffffff;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+            </div>
+ 
+            <div class="face back">
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+                <div style="background: #ffffff;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+            </div>
+            <div class="face left">
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+                <div style="background: #ffffff;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+            </div>
+            <div class="face right">
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+                <div style="background: #ffffff;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+            </div>
+            <div class="face top">
+                <div style="background: #2196f3;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #ffffff;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+            </div>
+            <div class="face bottom">
+                <div style="background: #ffffff;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+                <div style="background: #ffeb3b;" class="cube"></div>
+                <div style="background: #4caf50;" class="cube"></div>
+                <div style="background: #2196f3;" class="cube"></div>
+                <div style="background: #ffffff;" class="cube"></div>
+                <div style="background: #ff3d00;" class="cube"></div>
+            </div>
+        </div>
+      </div>
           
         <div class="table-responsive" id = "tbl_div">
             <table style="width: 100%;"  class="table"  id="dataTable">   
@@ -284,7 +355,8 @@
 
 <script>
   function applyFilters() {
-   
+      $("#tbl_div").empty();
+      document.getElementById("loderDiv").style.display = "block";
       var dt = document.getElementById('disp_type').value;
       var ca = document.getElementById('created_at').value;
       var dp = document.getElementById('department').value;
@@ -299,6 +371,7 @@
           success: function (data) {
             debugger;
               $("#dataTable").DataTable().destroy();
+              document.getElementById("loderDiv").style.display = "none";
               $("#tbl_div").empty().append(data.html);
               initializeDataTable();
           }

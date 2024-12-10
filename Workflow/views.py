@@ -25,6 +25,7 @@ from django.template.loader import render_to_string
 import time
 import xlsxwriter
 import io
+
 @login_required 
 def index(request):
     pre_url = request.META.get('HTTP_REFERER')
@@ -61,7 +62,6 @@ def index(request):
     finally: 
          return render(request,'Workflow/index.html', context)
     
-
 @login_required
 def partial_table(request):
     data = []
