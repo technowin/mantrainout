@@ -237,28 +237,32 @@ def download_xls(request):
                 su =str(request.POST.get('send_userh', ''))
                 bh =str(request.POST.get('branchh', ''))
                 sh =str(request.POST.get('stakeholderh', ''))
+                import array
 
                 header = callproc("stp_get_masters", ['wf',dt,'sample_xlsx',user])
+                header = [item[0] for item in header]
+
                 rows = callproc("stp_get_workflow",[dt,dp,su,bh,sh,ca,user,'xls'])
                 output = io.BytesIO()
                 workbook = xlsxwriter.Workbook(output)
                 worksheet = workbook.add_worksheet(str(dt) + ' Report')
 
-                worksheet.insert_image('A1', 'static/images/technologo1.png', {'x_offset': 10, 'y_offset': 10, 'x_scale': 0.5, 'y_scale': 0.5})
+                worksheet.insert_image('A1', 'static/images/technologo1.png', {'x_offset': 50, 'y_offset': 50, 'x_scale': 0.5, 'y_scale': 0.5})
 
                 header_format = workbook.add_format({'align': 'center', 'bold': True, 'font_size': 14})
                 data_format = workbook.add_format({'border': 1})
-                worksheet.merge_range('A1:Z1', dt +' Report', workbook.add_format({'bold': True, 'align': 'center', 'font_size': 16}))
+                # title_format = workbook.add_format({'bold': True, 'font_size': 16, 'align': 'center', 'valign': 'vcenter', 'border': 1})
 
-                # worksheet.merge_range('A4:{}'.format(chr(65+len(header)-1)+'2'), dt + ' Report', header_format)
+                worksheet.merge_range('A4:{}'.format(chr(65+len(header)-1)+'2'), dt + ' Report', header_format)
 
-                header_format = workbook.add_format({'bold': True, 'bg_color': '#DD8C8D', 'font_color': 'black'})
+                header_format = workbook.add_format({'bold': True, 'bg_color': '#ABCaff', 'font_color': 'black','border': 1})
                 for i, column_name in enumerate(header):
                     worksheet.write(6, i, column_name, header_format)
 
                 for row_num, row_data in enumerate(rows, start=7):
                     for col_num, col_data in enumerate(row_data):
                         worksheet.write(row_num, col_num, col_data, data_format)
+                        
                 workbook.close()
                 response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
                 response['Content-Disposition'] = 'attachment; filename="' + str(dt) + ' Report' + '.xlsx"'
