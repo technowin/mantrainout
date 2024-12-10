@@ -126,7 +126,7 @@
                     <div class="col-md-6">
                       <label for="disp_type" class="form-label">Dispatch Type:</label>
                       <select id="disp_type" name="disp_type" class="form-control" style="border-color: black; border-radius: 10px; " {% if wf %}disabled{% else %}required{% endif %} >
-                          <option value="All">Select</option>
+                          <option value="All" selected>Select</option>
                           {% for item in dt %}
                               <option value="{{ item.0 }}">{{ item.1 }}</option>
                           {% endfor %}
@@ -143,7 +143,7 @@
                         <div class="col-md-6">
                             <label for="department" class="form-label">Department:</label>
                             <select id="department" name="department" class="form-control" style="border-color: black; border-radius: 10px;">
-                                <option value="" selected disabled>Select</option>
+                                <option value="" selected >Select</option>
                                 {% for item in dp %}
                                     <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.department %}selected{% endif %}>{{ item.1 }}</option>
                                 {% endfor %}
@@ -152,7 +152,7 @@
                         <div class="col-md-6">
                             <label for="send_user" class="form-label">Send-User:</label>
                             <select  id="send_user" name="send_user" class="form-control" style="border-color: black; border-radius: 10px; " >
-                                <option value=""  selected disabled>Select</option>
+                                <option value=""  selected >Select</option>
                                 {% for item in su %}
                                     <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.send_user %}selected{% endif %} >{{ item.1 }}</option>
                                 {% endfor %}
@@ -166,7 +166,7 @@
                         <div class="col-md-6">
                             <label for="branch" class="form-label">Branch:</label>
                             <select  id="branch" name="branch" class="form-control" style="border-color: black; border-radius: 10px; " >
-                                <option value="" selected  disabled>Select</option>
+                                <option value="" selected  >Select</option>
                                 {% for item in bh %}
                                     <option value="{{ item.0 }}" {% if wf and item.0|to_str == wf.branch %}selected{% endif %} >{{ item.1 }}</option>
                                 {% endfor %}
@@ -176,7 +176,7 @@
                             <input type="hidden" id="shh_id" name="shh_id" value="{{wf.stakeholders}}" />
                             <label for="stakeholder" class="form-label">Stakeholder:</label>
                             <select  id="stakeholder" name="stakeholder" class="form-control"  style="border-color: black; border-radius: 10px; " >
-                                <option value="" selected  disabled>Select</option>
+                                <option value="" selected  >Select</option>
                                 {% for item in sh %}
                                     <option value="{{ item.0 }}" >{{ item.1 }}</option>
                                 {% endfor %}
