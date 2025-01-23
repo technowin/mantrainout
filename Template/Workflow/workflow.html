@@ -17,6 +17,11 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+ <!-- Selectize css -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css">
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+ 
+
 <style>
 
 </style>
@@ -230,6 +235,7 @@
             create: true, // Allow adding new options
             maxItems: 1, // Limit to a single selection
             selectOnTab: true, // Select the item when pressing Tab
+            dropdownParent: 'body',
             onInitialize: function () {
                 console.log('Selectize initialized!');
             }
