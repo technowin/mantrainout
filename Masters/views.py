@@ -100,6 +100,8 @@ def masters(request):
                 messages.success(request, 'Data inserted successfully !')
             elif datalist1[0][0] == 'update':
                 messages.success(request, 'Data updated successfully !')
+            elif datalist1[0][0] == 'exist':
+                messages.error(request, 'Data already exist !')
             
                           
     except Exception as e:
