@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 def masters(request):
     pre_url = request.META.get('HTTP_REFERER')
     header, data = [], []
-    entity, type, name = '', '', ''
+    entity, type, name, id, text_name = '', '', '', '', ''
     global user
     user  = request.session.get('user_id', '')
     try:
@@ -64,17 +64,30 @@ def masters(request):
             name = datalist1[0][0]
             header = callproc("stp_get_masters", [entity, type, 'header',user])
             rows = callproc("stp_get_masters",[entity,type,'data',user])
+            id = request.GET.get('id', '')
+            if type=='ed' and id != '0':
+                if id != '0' and id != '':
+                    id = dec(id)
+                rows = callproc("stp_get_masters",[entity,type,'data',id])
+                text_name = rows[0][0]
+                id = enc(id)
             data = []
-            if (entity == 'menu' or entity == 'user') and type !='err': 
-                for row in rows:
-                    encrypted_id = enc(str(row[0]))
-                    data.append((encrypted_id,) + row[1:])
-            else:data = rows
+            for row in rows:
+                encrypted_id = enc(str(row[0]))
+                data.append((encrypted_id,) + row[1:])
 
         if request.method=="POST":
             entity = request.POST.get('entity', '')
-            type = request.POST.get('type', '')
-            messages.success(request, 'Data updated successfully !')
+            id = request.POST.get('id', '')
+            if id != '0' and id != '':
+                id = dec(id)
+            name = request.POST.get('text_name', '')
+            datalist1= callproc("stp_post_masters",[entity,id,name,user])
+            if datalist1[0][0] == 'insert':
+                messages.success(request, 'Data inserted successfully !')
+            elif datalist1[0][0] == 'update':
+                messages.success(request, 'Data updated successfully !')
+            
                           
     except Exception as e:
         tb = traceback.extract_tb(e.__traceback__)
@@ -84,9 +97,9 @@ def masters(request):
     finally:
         Db.closeConnection()
         if request.method=="GET":
-            return render(request,'Master/index.html', {'entity':entity,'type':type,'name':name,'header':header,'data':data,'pre_url':pre_url})
+            return render(request,'Master/index.html', {'entity':entity,'type':type,'name':name,'header':header,'data':data,'id':id,'text_name':text_name})
         elif request.method=="POST":  
-            new_url = f'/masters?entity={entity}&type={type}'
+            new_url = f'/masters?entity={entity}&type=i'
             return redirect(new_url) 
  
 def sample_xlsx(request):
