@@ -107,6 +107,9 @@ class stakeholders(models.Model):
 class send_user(models.Model):
     id = models.AutoField(primary_key=True)
     name =  models.TextField(null=True, blank=True)
+    email =  models.TextField(null=True, blank=True)
+    mobile =  models.TextField(null=True, blank=True)
+    department =  models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     created_by =  models.TextField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)

@@ -52,11 +52,12 @@ logger = logging.getLogger(__name__)
 def masters(request):
     pre_url = request.META.get('HTTP_REFERER')
     header, data = [], []
-    entity, type, name, id, text_name = '', '', '', '', ''
-    global user
-    user  = request.session.get('user_id', '')
+    entity,type,name,id,text_name,dpl,dp,em,mb = '','','','','','','','',''
     try:
-         
+        if request.user.is_authenticated ==True:                
+                global user,role_id
+                user = request.user.id    
+                role_id = request.user.role_id 
         if request.method=="GET":
             entity = request.GET.get('entity', '')
             type = request.GET.get('type', '')
@@ -64,12 +65,18 @@ def masters(request):
             name = datalist1[0][0]
             header = callproc("stp_get_masters", [entity, type, 'header',user])
             rows = callproc("stp_get_masters",[entity,type,'data',user])
+            if entity == 'su':
+                dpl = callproc("stp_get_dropdown_values",['dept'])
             id = request.GET.get('id', '')
             if type=='ed' and id != '0':
                 if id != '0' and id != '':
                     id = dec(id)
                 rows = callproc("stp_get_masters",[entity,type,'data',id])
                 text_name = rows[0][0]
+                if entity == 'su':
+                    em = rows[0][1]
+                    mb = rows[0][2]
+                    dp = rows[0][3]
                 id = enc(id)
             data = []
             for row in rows:
@@ -79,10 +86,16 @@ def masters(request):
         if request.method=="POST":
             entity = request.POST.get('entity', '')
             id = request.POST.get('id', '')
+            dp = request.POST.get('dp', '')
+            em = request.POST.get('em', '')
+            mb = request.POST.get('mb', '')
             if id != '0' and id != '':
                 id = dec(id)
             name = request.POST.get('text_name', '')
-            datalist1= callproc("stp_post_masters",[entity,id,name,user])
+            if entity == 'su':
+                datalist1= callproc("stp_post_user_masters",[id,name,em,mb,dp,user])
+            else: datalist1= callproc("stp_post_masters",[entity,id,name,user])
+
             if datalist1[0][0] == 'insert':
                 messages.success(request, 'Data inserted successfully !')
             elif datalist1[0][0] == 'update':
@@ -97,7 +110,9 @@ def masters(request):
     finally:
         Db.closeConnection()
         if request.method=="GET":
-            return render(request,'Master/index.html', {'entity':entity,'type':type,'name':name,'header':header,'data':data,'id':id,'text_name':text_name})
+            return render(request,'Master/index.html',
+              {'entity':entity,'type':type,'name':name,'header':header,'data':data,
+              'id':id,'text_name':text_name,'dp':dp,'em':em,'mb':mb,'dpl':dpl})
         elif request.method=="POST":  
             new_url = f'/masters?entity={entity}&type=i'
             return redirect(new_url) 
