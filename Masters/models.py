@@ -103,7 +103,17 @@ class stakeholders(models.Model):
     
     class Meta:
         db_table = 'stakeholders'
-        
+
+class send_user(models.Model):
+    id = models.AutoField(primary_key=True)
+    name =  models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    created_by =  models.TextField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    updated_by =  models.TextField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'send_user'       
 
 class Log(models.Model):
     log_text = models.TextField(null=True,blank=True)
