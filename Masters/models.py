@@ -125,4 +125,30 @@ class Log(models.Model):
         db_table = 'logs'
 
 
-    
+class Form(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class FormField(models.Model):
+    form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='fields')
+    label = models.CharField(max_length=255)
+    field_type = models.CharField(max_length=50, choices=[('text', 'Text'), ('number', 'Number'), ('email', 'Email'),
+                                                           ('select', 'Dropdown'), ('checkbox', 'Checkbox'),
+                                                           ('radio', 'Radio'), ('textarea', 'Textarea')])
+    required = models.BooleanField(default=False)
+    order = models.IntegerField(default=0)  # Drag-drop order
+    row_position = models.IntegerField(default=1)  # Defines row placement
+
+class FieldValidation(models.Model):
+    field = models.ForeignKey(FormField, on_delete=models.CASCADE, related_name='validations')
+    rule = models.CharField(max_length=50, choices=[('min_length', 'Min Length'), ('max_length', 'Max Length'),
+                                                     ('regex', 'Regex'), ('custom', 'Custom Rule')])
+    value = models.CharField(max_length=255)
+
+class FieldDependency(models.Model):
+    field = models.ForeignKey(FormField, on_delete=models.CASCADE, related_name='dependencies')
+    dependent_on = models.ForeignKey(FormField, on_delete=models.CASCADE, related_name='dependent_fields')
+    condition = models.CharField(max_length=255)  # JSON-based logic (e.g., {'value': 'yes'})
+
+

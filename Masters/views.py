@@ -173,3 +173,59 @@ def sample_xlsx(request):
         messages.error(request, 'Oops...! Something went wrong!')
     finally:
         return response      
+
+
+def form_builder(request):
+    return render(request, "Master/form_builder.html")
+
+@csrf_exempt
+def create_form(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        form = Form.objects.create(name=data['name'], description=data.get('description', ''))
+
+        for field_data in data['fields']:
+            field = FormField.objects.create(
+                form=form,
+                label=field_data['label'],
+                field_type=field_data['type'],
+                required=field_data['required'],
+                order=field_data['order'],
+                row_position=field_data['row']
+            )
+
+            for validation in field_data.get('validations', []):
+                FieldValidation.objects.create(field=field, rule=validation['rule'], value=validation['value'])
+
+            for dependency in field_data.get('dependencies', []):
+                dependent_field = FormField.objects.get(id=dependency['field_id'])
+                FieldDependency.objects.create(field=field, dependent_on=dependent_field, condition=json.dumps(dependency['condition']))
+
+        return JsonResponse({"success": True, "form_id": form.id})
+
+@csrf_exempt
+def get_form(request, form_id):
+    try:
+        form = Form.objects.prefetch_related('fields').get(id=form_id)
+        form_data = {
+            "name": form.name,
+            "description": form.description,
+            "fields": []
+        }
+        
+        for field in form.fields.all():
+            field_data = {
+                "id": field.id,
+                "label": field.label,
+                "type": field.field_type,
+                "required": field.required,
+                "order": field.order,
+                "row": field.row_position,
+                "validations": [{"rule": v.rule, "value": v.value} for v in field.validations.all()],
+                "dependencies": [{"field_id": d.dependent_on.id, "condition": json.loads(d.condition)} for d in field.dependencies.all()]
+            }
+            form_data['fields'].append(field_data)
+
+        return JsonResponse(form_data)
+    except Form.DoesNotExist:
+        return JsonResponse({"error": "Form not found"}, status=404)

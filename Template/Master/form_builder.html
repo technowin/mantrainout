@@ -1,0 +1,112 @@
+{% extends "Shared/Layout.html" %} {% block username %}{{username}}{% endblock %}
+{% block content %}
+{% load static %}
+{% csrf_token %}
+
+ <!-- Custom styles for this html-->
+ <link href="{% static 'css/masters.css' %}" rel="stylesheet" type="text/css" >
+ <link href="{% static 'css/table.css' %}" rel="stylesheet" type="text/css" >
+ <link href="{% static 'css/uploadExcel.css' %}" rel="stylesheet" type="text/css" >
+ <link href="{% static 'css/uploadModal.css' %}" rel="stylesheet" type="text/css" >
+ <link rel="stylesheet" type="text/css" href="{% static 'css/tooltips.css' %}" />
+
+ <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+ <!-- Include DataTables CSS -->
+ <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+ <!-- Include DataTables JS -->
+ <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+
+
+ <div class=" mt-4">
+    <form method="POST" class="row  col-md-12"  style="padding: 20px;border: 2px solid #b3b3b3;border-radius: 15px;margin-left:0px;align-item:center;justify-content:center;text-align:center">
+        {% csrf_token %}
+        <div class="col-md-4">
+            <label>Form Name:</label>
+            <input type="text" class="form-control" name="form_name" value="{{ form.name|default:'' }}" required>
+        </div>
+        
+        <div class="col-md-4">
+            <label>Form Description:</label>
+            <input type="text"  class="form-control" name="form_description">{{ form.description|default:'' }}</input>
+        </div>
+        <div class="col-md-4 mt-3">
+            <button type="submit" class="btn btn-primary mt-3">Save Form</button>
+
+        </div>
+    </form>   
+    <br> 
+    <div class="row"  style="padding: 20px;border: 2px solid #b3b3b3;border-radius: 15px;margin-left:0px;">
+        <!-- Form Builder (Left Panel) -->
+        <div class="col-md-6">
+            <h2 style="text-align:center;font-weight:600;color:black">Form Builder &nbsp;&nbsp;&nbsp;&nbsp;<button class="btn btn-primary" onclick="addField()"> Add Field</button>            </h2>
+            <div id="form-builder" class="row col-md-12 mt-3"></div>
+        </div>
+
+        <!-- Live Preview (Right Panel) -->
+        <div class="col-md-6">
+            <h2 style="text-align:center;font-weight:600;color:black">Live Preview</h2>
+            <form id="dynamic-form" class="row col-md-12 "></form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let formFields = [];
+    function addField() {
+        let id = formFields.length + 1;
+        formFields.push({ id, label: `Field ${id}`, type: 'text', required: false, order: id });
+        renderFormBuilder();
+        renderFormPreview();
+    }
+
+    function renderFormBuilder() {
+        let builder = $("#form-builder").empty();
+        formFields.forEach(field => {
+            builder.append(`<div class="col-md-4 mb-3">
+                <input class="form-comtrols " type="text" value="${field.label}" onchange="updateField(${field.id}, 'label', this.value)">
+                </div>
+                <div class="col-md-4  mb-3">
+                <select class="form-comtrols select " onchange="updateField(${field.id}, 'type', this.value)">
+                    <option value="text">Text</option>
+                    <option value="number">Number</option>
+                    <option value="email">Email</option>
+                </select>
+                </div>
+                <div class="col-md-4  mb-3">
+                <button class="btn btn-danger" onclick="removeField(${field.id})">Remove</button>
+            </div>`);
+        });
+    }
+
+    function renderFormPreview() {
+        let preview = $("#dynamic-form").empty();
+        formFields.forEach(field => {
+            preview.append(`<div class="col-md-4 mb-2">
+                <label>${field.label}</label>
+                <input type="${field.type}" class="form-control">
+            </div>`);
+        });
+    }
+
+    function updateField(id, key, value) {
+        formFields = formFields.map(f => f.id === id ? { ...f, [key]: value } : f);
+        renderFormPreview();
+    }
+
+    function removeField(id) {
+        formFields = formFields.filter(f => f.id !== id);
+        renderFormBuilder();
+        renderFormPreview();
+    }
+</script>
+
+
+
+
+  <!-- End of Main Content -->
+  {% endblock %}

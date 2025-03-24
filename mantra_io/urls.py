@@ -29,6 +29,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # APP URLS
 
+    path('form-builder/', form_builder, name='form_builder'),  # Render HTML
+    path('api/create-form/', create_form, name='create_form'),  # API to create forms
+    path('api/get-form/<int:form_id>/', get_form, name='get_form'),
+
     # Account
     path("", Login,name='Account'),
     path("Login", Login,name='Account'),
